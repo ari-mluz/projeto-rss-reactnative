@@ -1,35 +1,46 @@
 import React from 'react';
-import { View, Text, StyleSheet, Button, Image } from 'react-native';
-import { FlatList, TouchableOpacity } from 'react-native-gesture-handler';
+import { View, Text, StyleSheet, Button, Image, Linking, TouchableOpacity } from 'react-native';
+import { FlatList } from 'react-native-gesture-handler';
 import { Context as FeedListContext } from '../context/FeedListContext'
 import { Context as FeedContext } from '../context/FeedContext'
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 
 
 const ShowFeedScreen = ({ route, navigation }) => {
     const feedListContext = useContext(FeedListContext);
     const feedID = route.params.id;
-    console.log(feedID);
-    const feed = feedListContext.state.find((feed) => feed.urlFeed === feedID);
+    const feed = feedListContext.state.find((feed) => feed.id === feedID);
     const { state, fetchItems } = useContext(FeedContext);
-    fetchItems(feed.urlFeed);
-
+    
+    //executa a função 'fetchItems' ao carregar o componente
+    useEffect(() => {
+        fetchItems(feed.urlFeed);
+    }, []);
+    
+    //abre o link no navegador ao ser chamada
     const abrirLink = (link) => {
-        console.log('implementar, mandar o usuário para o link da notícia (item.link)');
+        Linking.openURL(link);
     }
 
     return (
         <>
             <FlatList
                 data={state}
-                keyExtractor={(item) => item.link}
+                keyExtractor={(feed) => feed.link}
                 renderItem={({ item }) => {
-                    //atualmente só exibe o título, faça com que apareça data de publicação, descrição (pode cortar em 100 ou 200 caracteres para não ficar muito grande), e imagem (caso tenha)
-                    //ao clicar em uma notícia, devemos chamar a função abrirLink que direciona o usuário para o link da notícia
+                    
                     return (
-                        <View style={styles.row}>
-                            <Text style={styles.titulo}>{item.titulo}</Text>
-                        </View>
+                        //chama a função abrir link ao clicar na notícia
+                        <TouchableOpacity onPress={() => abrirLink(item.link)}>
+                            <View style={styles.row}>
+                                <Text style={styles.titulo}>{item.titulo}</Text>
+                                <Text style={styles.dataPublicacao}>{item.dataPublicacao}</Text>
+                                <Text style={styles.descricao}>{item.conteudo}</Text>
+                                { //verifica se existe imagem e, caso não exista, exibe uma imagem padrão
+                                    item.imagem != null && item.imagem != "" ? <Image style={styles.image} source={{uri: item.imagem}} /> :  <Image style={styles.image} source={{uri: 'https://placehold.co/400'}} /> 
+                                }
+                            </View>
+                        </TouchableOpacity>
                     );
                 }}
             />
@@ -40,7 +51,7 @@ const ShowFeedScreen = ({ route, navigation }) => {
 //altere os estilos como desejar para melhorar o layout
 const styles = StyleSheet.create({
     row: {
-        flexDirection: 'row',
+        flexDirection: 'column',
         justifyContent: 'space-between',
         paddingVertical: 20,
         paddingHorizontal: 10,
@@ -59,6 +70,8 @@ const styles = StyleSheet.create({
         margin: 5
     },
     descricao: {
+        maxHeight: 45,
+        overflow: 'hidden',
         fontSize: 8
     },
     dataPublicacao: {

@@ -7,10 +7,14 @@ import AddFeedScreen from './src/screens/AddFeedScreen';
 import { Feather } from '@expo/vector-icons';
 import { Provider as FeedListProvider } from './src/context/FeedListContext';
 import { Provider as FeedProvider } from './src/context/FeedContext';
+import { Context } from './src/context/FeedListContext';
+import { useContext } from 'react';
 
 const Stack = createNativeStackNavigator();
 
+
 const App = () => {
+  const {restoreState} = useContext(Context);
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName='Home'>
@@ -19,7 +23,7 @@ const App = () => {
         component={IndexScreen} 
         options={({navigation}) => ({
           headerRight: () => (
-            <TouchableOpacity onPress={() => console.log('implementar')}>
+            <TouchableOpacity onPress={() => navigation.navigate('Add')}>
               <Feather name="plus" size={30} />
             </TouchableOpacity>
           )

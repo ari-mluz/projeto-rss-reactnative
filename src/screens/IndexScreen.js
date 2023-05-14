@@ -5,19 +5,19 @@ import { useContext } from 'react';
 import { Context } from '../context/FeedListContext'
 
 const IndexScreen = ({ navigation }) => {
-    const { state } = useContext(Context);
+    const { state, deleteFeed } = useContext(Context);
 
     return (
         <>
             <FlatList
                 data={state}
-                keyExtractor={(rssfeed) => rssfeed.urlFeed}
+                keyExtractor={(rssfeed) => rssfeed.id}
                 renderItem={({ item }) => {
                     return (
-                        <TouchableOpacity onPress={() => navigation.navigate('Show', { id: item.urlFeed })}>
+                        <TouchableOpacity onPress={() => navigation.navigate('Show', { id: item.id })}>
                             <View style={styles.row}>
                                 <Text style={styles.title}>{item.titulo}</Text>
-                                <TouchableOpacity onPress={() => { console.log('implementar'); }}>
+                                <TouchableOpacity onPress={() => { deleteFeed(item.id) }}>
                                     <Feather style={styles.icon} name="trash" />
                                 </TouchableOpacity>
                             </View>
